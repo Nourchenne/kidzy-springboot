@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/contact.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,800" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/img/logo11.png">
+    <style>
+        .message {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .message.success {
+            color: green;
+        }
+        .message.error {
+            color: red;
+        }
+    </style>
+</head>
+
+
+<nav>
+    <div class="nav-container">
+        <a href="index.html">
+            <img src="img/logo2.png" alt="Logo" class="logo">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="/produits.html">Products</a>
+            <a href="/about.html">About</a>
+            <a href="/contact.html">Contact</a>
+        </div>
+        <a href="/login.html">
+            <img src="img/user-icon.png" alt="User Icon" style="width: 50px; height: 50px;">
+        </a>
+    </div>
+</nav>
+
+<body>
+
+
+<section class="contact-page-section">
+    <div class="container">
+        <div class="sec-title">
+            <div class="title">Contactez-nous</div>
+            <h2>Nous sommes à votre écoute</h2>
+        </div>
+        <div class="inner-container">
+            <div class="row clearfix">
+
+                <div class="form-column col-md-8 col-sm-12 col-xs-12">
+                    <div class="inner-column">
+                        <div class="contact-form">
+                            <div id="form-message" class="message"></div>
+                            <form id="contact-form">
+                                <div class="row clearfix">
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <input type="text" name="name" placeholder="Nom" required>
+                                    </div>
+                                    <div class="form-group col-md-6 col-sm-6 col-xs-12">
+                                        <input type="email" name="email" placeholder="Email" required>
+                                    </div>
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                        <textarea name="message" placeholder="Message" required></textarea>
+                                    </div>
+                                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                                        <button type="submit" class="theme-btn btn-style-one">Envoyer</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-column col-md-4 col-sm-12 col-xs-12">
+                    <div class="inner-column">
+                        <h2>Informations de contact</h2>
+                        <ul class="list-info">
+                            <li><i class="fas fa-globe"></i>123 Ezzahra, Ben Arous.</li>
+                            <li><i class="far fa-envelope"></i>kidzy@gmail.com</li>
+                            <li><i class="fas fa-phone"></i>99 887 766</li>
+                        </ul>
+                        <ul class="social-icon-four">
+                            <li class="follow">Suivez-nous : </li>
+                            <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                            <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- JavaScript pour simuler l’envoi du formulaire -->
+<script>
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = this.name.value.trim();
+        const email = this.email.value.trim();
+        const message = this.message.value.trim();
+        const messageBox = document.getElementById('form-message');
+
+        if (name && email && message) {
+            // Prépare les données en JSON à envoyer
+            const data = {
+                nom: name,
+                email: email,
+                message: message,
+                // dateContact : tu peux laisser null ou ne pas l'envoyer et la gérer côté serveur
+            };
+
+            fetch('/api/contacts', { // adapte le port si besoin
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau ou serveur');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    messageBox.textContent = "Votre message a été envoyé avec succès.";
+                    messageBox.className = "message success";
+                    // Reset form après succès
+                    this.reset();
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    messageBox.textContent = "Une erreur est survenue lors de l'envoi.";
+                    messageBox.className = "message error";
+                });
+        } else {
+            messageBox.textContent = "Tous les champs doivent être remplis.";
+            messageBox.className = "message error";
+        }
+    });
+</script>
+
+
+</body>
+
+<div class="footer-bottom">
+      <p>© 2025 Kidzy. All rights reserved. | Designed in Tunisia</p>
+</div>
+
+</html>

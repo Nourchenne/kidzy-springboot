@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Accueil Parent</title>
+  <link rel="stylesheet" href="/css/hp.css" />
+  <link rel="icon" type="image/png" href="img/logo11.png" />
+</head>
+
+<body>
+<nav>
+  <div class="nav-container">
+    <a href="index.html">
+      <img src="img/logo2.png" alt="Logo" class="logo" />
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="/produits.html">Products</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+    <a href="/login.html">
+      <img src="img/user-icon.png" alt="User Icon" style="width: 50px; height: 50px;" />
+    </a>
+  </div>
+</nav>
+
+<div class="publication-box">
+  <h3>Publier une Demande de Garde d’Enfants</h3>
+
+  <div id="message" style="text-align: center; font-weight: bold;"></div>
+
+  <form id="demande-form">
+    <input type="text" name="nom" placeholder="Votre nom" required /><br />
+    <input type="email" name="email" placeholder="Votre adresse email" required /><br />
+    <input type="text" name="localisation" placeholder="Votre localisation" required /><br />
+    <input type="number" name="nombreEnfants" placeholder="Nombre d’enfants" required min="1" /><br />
+    <textarea name="message" placeholder="Informations supplémentaires (facultatif)"></textarea><br />
+    <button type="submit" class="publish-btn">Envoyer la demande</button>
+  </form>
+</div>
+
+<div class="articles">
+  <h3>Nos Babysitters</h3>
+  <div id="babysitter-list">Chargement...</div>
+</div>
+
+<script>
+  // Gestion du formulaire de demande
+  document.getElementById('demande-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const messageDiv = document.getElementById('message');
+
+    const data = {
+      nom: form.nom.value.trim(),
+      email: form.email.value.trim(),
+      localisation: form.localisation.value.trim(),
+      nombreEnfants: parseInt(form.nombreEnfants.value, 10),
+      message: form.message.value.trim()
+    };
+
+    if (!data.nom || !data.email || !data.localisation || !data.nombreEnfants || data.nombreEnfants < 1) {
+      messageDiv.style.color = 'red';
+      messageDiv.textContent = 'Veuillez remplir correctement tous les champs obligatoires.';
+      return;
+    }
+
+    fetch('/api/requests', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    })
+            .then(response => {
+              if (!response.ok) throw new Error('Erreur lors de l’envoi de la demande');
+              return response.json();
+            })
+            .then(newRequest => {
+              messageDiv.style.color = 'green';
+              messageDiv.textContent = 'Demande envoyée avec succès !';
+              form.reset();
+            })
+            .catch(error => {
+              messageDiv.style.color = 'red';
+              messageDiv.textContent = error.message || 'Erreur réseau';
+            });
+  });
+
+  // Chargement des babysitters
+  async function loadBabysitters() {
+    try {
+      const response = await fetch('/api/babysitters');
+      if (!response.ok) throw new Error('Erreur API : ' + response.status);
+
+      const babysitters = await response.json();
+      const container = document.getElementById('babysitter-list');
+      container.innerHTML = '';
+
+      if (babysitters.length === 0) {
+        container.textContent = 'Aucun babysitter disponible.';
+        return;
+      }
+
+      babysitters.forEach(bs => {
+        const div = document.createElement('div');
+        div.classList.add('article');
+
+
+        div.innerHTML = `
+          <img src="${bs.photo}" alt="Photo de ${bs.nom}" />
+          <h4>${bs.nom}</h4>
+          <p>Âge : ${bs.age} ans</p>
+          <p>Email : <a href="mailto:${bs.email}">${bs.email}</a></p>
+          <p>Téléphone : ${bs.num}</p>
+          <p>Adresse : ${bs.adresse}</p>
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(bs.email)}&su=Demande%20de%20babysitting&body=Bonjour%20${encodeURIComponent(bs.nom)},%0D%0AJe%20suis%20intéressé(e)%20par%20vos%20services%20de%20garde%20d’enfants." class="contact-btn" target="_blank">Contacter</a>
+        `;
+
+        container.appendChild(div);
+      });
+    } catch (err) {
+      console.error(err);
+      document.getElementById('babysitter-list').textContent = 'Erreur lors du chargement.';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadBabysitters);
+
+</script>
+
+<div class="footer-bottom">
+  <p>© 2025 Kidzy. All rights reserved. | Designed in Tunisia</p>
+</div>
+</body>
+</html>

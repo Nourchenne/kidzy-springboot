@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tableau de bord Admin</title>
+  <link rel="stylesheet" href="/css/admin.css" />
+  <script src="/js/admin.js" defer></script>
+</head>
+<body>
+
+<nav>
+  <div class="nav-container">
+    <a href="index.html">
+      <img src="img/logo2.png" alt="Logo" class="logo">
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="/produits.html">Products</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+    <a href="/login.html">
+      <img src="img/user-icon.png" alt="User Icon" style="width: 50px; height: 50px;">
+    </a>
+  </div>
+</nav>
+
+<header>
+  <h1>Tableau de bord Admin</h1>
+</header>
+
+<section class="table-section">
+  <!-- Table Parents -->
+  <div class="table-container" id="parentsTable">
+    <h2>Parents</h2>
+    <table id="parents-table" border="1" cellpadding="5" cellspacing="0">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Téléphone</th>
+        <th>Adresse</th>
+        <th>Nombre d'enfants</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Table Babysitters -->
+  <div class="table-container">
+    <h2>Babysitters</h2>
+    <table id="babysitters-table" border="1" cellpadding="5" cellspacing="0">
+      <thead>
+      <tr>
+        <th>ID</th><th>Nom</th><th>Email</th><th>Numéro</th><th>CIN</th>
+        <th>Adresse</th><th>Âge</th><th>Photo</th><th>Actions</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+
+  <!-- Demandes -->
+  <div class="table-container">
+    <h2>Demandes de Garde d’Enfants</h2>
+    <table id="requests-table" border="1" cellpadding="5" cellspacing="0">
+      <thead>
+      <tr>
+        <th>ID</th><th>Nom</th><th>Email</th><th>Localisation</th><th>Nombre d’enfants</th><th>Message</th><th>Actions</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Contacts -->
+  <div class="table-container">
+    <h2>Liste des Contacts</h2>
+    <table id="contacts-table" border="1" cellpadding="5" cellspacing="0">
+      <thead>
+      <tr><th>ID</th><th>Nom</th><th>Email</th><th>Message</th><th>Actions</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Produits -->
+  <div class="table-container">
+    <h2>Produits</h2>
+    <table id="produitsTable">
+      <thead>
+      <tr>
+        <th>ID</th><th>Nom</th><th>Prix</th><th>Description</th><th>Photo</th><th>Actions</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Ajouter produit -->
+  <section class="form-section">
+    <h2>Ajouter un Produit</h2>
+    <div class="form-container">
+      <form id="produitForm">
+        <input type="text" name="nom" placeholder="Nom du produit" required>
+        <input type="number" name="prix" placeholder="Prix" step="0.01" required>
+        <textarea name="description" placeholder="Description" required></textarea>
+        <input type="text" name="photo" placeholder="Lien de la photo" required>
+        <button type="submit">Ajouter</button>
+      </form>
+    </div>
+  </section>
+</section>
+
+<!-- Footer -->
+<div class="footer-bottom">
+  <p>© 2025 Kidzy. All rights reserved. | Designed in Tunisia</p>
+</div>
+
+<!-- Scripts -->
+<script>
+  // Fonction générique pour supprimer une ligne de tableau
+  function supprimerLigne(btn) {
+    if (confirm("Voulez-vous vraiment supprimer cette ligne ?")) {
+      btn.closest("tr").remove();
+    }
+  }
+
+  // Chargement des Parents
+  function loadParents() {
+    fetch('/api/parents')
+            .then(res => res.json())
+            .then(data => {
+              const tbody = document.querySelector('#parentsTable tbody');
+              tbody.innerHTML = '';
+              data.forEach(parent => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${parent.id}</td>
+          <td>${parent.nom}</td>
+          <td>${parent.email}</td>
+          <td>${parent.num}</td>
+          <td>${parent.adresse}</td>
+          <td>${parent.numEnfant}</td>
+          <td><button onclick="deleteParent(${parent.id}, this)">Supprimer</button></td>
+        `;
+                tbody.appendChild(tr);
+              });
+            })
+            .catch(error => {
+              console.error('Erreur de chargement des parents:', error);
+              alert('Erreur lors du chargement des parents.');
+            });
+  }
+
+  function deleteParent(id, btn) {
+    if (!confirm("Supprimer ce parent ?")) return;
+    fetch('/api/parents/' + id, { method: 'DELETE' })
+            .then(res => res.ok ? btn.closest('tr').remove() : alert("Erreur suppression parent"))
+            .catch(err => {
+              console.error('Erreur suppression parent:', err);
+              alert('Erreur réseau');
+            });
+  }
+
+  // Chargement des Babysitters
+  function loadBabysitters() {
+    fetch('/api/babysitters')
+            .then(res => res.json())
+            .then(data => {
+              const babysitterTable = document.querySelector('.table-container:nth-of-type(2) table');
+              const tbody = babysitterTable.querySelector('tbody') || babysitterTable.appendChild(document.createElement('tbody'));
+              tbody.innerHTML = '';
+              data.forEach(baby => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${baby.id}</td>
+          <td>${baby.nom}</td>
+          <td>${baby.email}</td>
+          <td>${baby.num}</td>
+          <td>${baby.cin}</td>
+          <td>${baby.adresse}</td>
+          <td>${baby.age}</td>
+          <td><img src="${baby.photo}" width="60" /></td>
+          <td><button onclick="deleteBabysitter(${baby.id}, this)">Supprimer</button></td>
+        `;
+                tbody.appendChild(tr);
+              });
+            })
+            .catch(error => {
+              console.error('Erreur chargement babysitters:', error);
+              alert('Erreur lors du chargement des babysitters');
+            });
+  }
+
+  function deleteBabysitter(id, btn) {
+    if (!confirm("Supprimer ce babysitter ?")) return;
+    fetch('/api/babysitters/' + id, { method: 'DELETE' })
+            .then(res => res.ok ? btn.closest('tr').remove() : alert("Erreur suppression babysitter"))
+            .catch(err => {
+              console.error('Erreur suppression babysitter:', err);
+              alert('Erreur réseau');
+            });
+  }
+
+  // Demandes
+  function loadRequests() {
+    fetch('/api/requests')
+            .then(r => r.json())
+            .then(data => {
+              const tbody = document.querySelector('#requests-table tbody');
+              tbody.innerHTML = '';
+              data.forEach(request => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${request.id}</td>
+          <td>${request.nom}</td>
+          <td>${request.email}</td>
+          <td>${request.localisation}</td>
+          <td>${request.nombreEnfants}</td>
+          <td>${request.message}</td>
+          <td><button onclick="deleteRequest(${request.id}, this)">Supprimer</button></td>
+        `;
+                tbody.appendChild(tr);
+              });
+            });
+  }
+
+  function deleteRequest(id, btn) {
+    if (!confirm('Supprimer cette demande ?')) return;
+    fetch('/api/requests/' + id, { method: 'DELETE' })
+            .then(res => res.ok ? btn.closest('tr').remove() : alert("Erreur suppression"));
+  }
+
+  // Contacts
+  function loadContacts() {
+    fetch('/api/contacts')
+            .then(r => r.json())
+            .then(data => {
+              const tbody = document.querySelector('#contacts-table tbody');
+              tbody.innerHTML = '';
+              data.forEach(contact => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${contact.id}</td>
+          <td>${contact.nom}</td>
+          <td>${contact.email}</td>
+          <td>${contact.message}</td>
+          <td><button onclick="deleteContact(${contact.id}, this)">Supprimer</button></td>
+        `;
+                tbody.appendChild(tr);
+              });
+            });
+  }
+
+  function deleteContact(id, btn) {
+    if (!confirm('Supprimer ce contact ?')) return;
+    fetch('/api/contacts/' + id, { method: 'DELETE' })
+            .then(res => res.ok ? btn.closest('tr').remove() : alert("Erreur suppression"));
+  }
+
+  // Produits
+  function chargerProduits() {
+    fetch('/api/produits')
+            .then(r => r.json())
+            .then(data => {
+              const tbody = document.querySelector('#produitsTable tbody');
+              tbody.innerHTML = '';
+              data.forEach(produit => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>${produit.id}</td>
+          <td>${produit.nom}</td>
+          <td>${Number(produit.prix).toFixed(3)} TND</td>
+          <td>${produit.description}</td>
+          <td><img src="${produit.photo}" width="60"></td>
+          <td>
+            <button onclick="modifierProduit(${produit.id})">Modifier</button>
+            <button onclick="supprimerProduit(${produit.id}, this)">Supprimer</button>
+          </td>
+        `;
+                tbody.appendChild(tr);
+              });
+            });
+  }
+
+  function modifierProduit(id) {
+    window.location.href = `edit_produit.html?id=${id}`;
+  }
+
+  function supprimerProduit(id, btn) {
+    if (!confirm("Supprimer ce produit ?")) return;
+    fetch(`/api/produits/${id}`, { method: 'DELETE' })
+            .then(res => res.ok ? btn.closest('tr').remove() : alert("Erreur suppression produit"));
+  }
+
+  // Ajout de produit
+  document.addEventListener('DOMContentLoaded', () => {
+    loadParents();
+    loadBabysitters();
+    loadRequests();
+    loadContacts();
+    chargerProduits();
+
+    document.getElementById('produitForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const form = event.target;
+
+      const produitData = {
+        nom: form.nom.value.trim(),
+        prix: parseFloat(form.prix.value),
+        description: form.description.value.trim(),
+        photo: form.photo.value.trim()
+      };
+
+      fetch('/api/produits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(produitData)
+      })
+              .then(res => {
+                if (res.ok) {
+                  alert('Produit ajouté avec succès !');
+                  form.reset();
+                  chargerProduits();
+                } else {
+                  return res.text().then(text => { throw new Error(text); });
+                }
+              })
+              .catch(error => {
+                console.error('Erreur ajout produit:', error);
+                alert('Erreur lors de l’ajout du produit');
+              });
+    });
+  });
+
+</script>
+
+</body>
+</html>

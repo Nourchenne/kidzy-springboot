@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Connexion / Inscription</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/l.css" />
+  <link rel="icon" type="image/png" href="/img/logo11.png" />
+</head>
+<body>
+
+<nav>
+  <div class="nav-container">
+    <a href="/index.html"><img src="/img/logo2.png" alt="Logo" class="logo" /></a>
+    <div class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/produits.html">Products</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </div>
+    <a href="/login.html"><img src="/img/user-icon.png" alt="User Icon" style="width: 50px; height: 50px;" /></a>
+  </div>
+</nav>
+
+<main>
+  <div class="container" id="container">
+
+    <!-- Formulaire d'inscription -->
+    <div class="form-container sign-up-container">
+      <form>
+        <h1>Créer un compte</h1>
+        <span>Inscrivez-vous en tant que :</span>
+        <div class="role-buttons">
+          <button type="button" class="bb" onclick="window.location.href='parentreg.html'">Parent</button>
+          <button type="button" class="bb" onclick="window.location.href='sitterreg.html'">Babysitter</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Formulaire de connexion -->
+    <div class="form-container sign-in-container">
+      <form id="loginForm">
+        <h1>Connexion</h1>
+        <input type="email" id="email" name="email" placeholder="Email" required />
+        <input type="password" id="password" name="password" placeholder="Mot de passe" required />
+        <button type="submit" class="bb">Se connecter</button>
+        <p id="errorMsg" style="color: red; display: none;"></p>
+        <p id="successMsg" style="color: green; display: none;">Connexion réussie !</p>
+      </form>
+    </div>
+
+    <!-- Panneau animation -->
+    <div class="overlay-container">
+      <div class="overlay">
+        <div class="overlay-panel overlay-left">
+          <h1 class="wb">Déjà inscrit ?</h1>
+          <button class="ghost" id="signIn">Se connecter</button>
+        </div>
+        <div class="overlay-panel overlay-right">
+          <h1 class="wb">Nouveau ici ?</h1>
+          <button class="ghost" id="signUp">S'inscrire</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="/js/login.js"></script>
+
+<div class="footer-bottom">
+  <p>© 2025 Kidzy. All rights reserved. | Designed in Tunisia</p>
+</div>
+
+</body>
+</html>

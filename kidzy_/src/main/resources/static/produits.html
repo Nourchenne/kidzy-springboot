@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nos Produits</title>
+    <link rel="stylesheet" href="/css/hp.css">
+</head>
+
+
+
+<nav>
+    <div class="nav-container">
+        <a href="index.html">
+            <img src="img/logo2.png" alt="Logo" class="logo">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="/produits.html">Products</a>
+            <a href="/about.html">About</a>
+            <a href="/contact.html">Contact</a>
+        </div>
+        <a href="/login.html">
+            <img src="img/user-icon.png" alt="User Icon" style="width: 50px; height: 50px;">
+        </a>
+    </div>
+</nav>
+
+
+
+<body>
+
+
+
+<section class="articles">
+    <h3>Nos Produits</h3>
+    <div id="produits-container">
+
+    </div>
+</section>
+
+<script>
+    function loadProduits() {
+        fetch('/api/produits')
+            .then(response => {
+                if (!response.ok) throw new Error('Erreur serveur');
+                return response.json();
+            })
+            .then(produits => {
+                const container = document.getElementById('produits-container');
+                container.innerHTML = ''; // Vider avant de remplir
+
+                produits.forEach(produit => {
+                    const produitHTML = `
+            <div class="article">
+              <img src="${produit.photo}" alt="Image du produit">
+              <h3>${produit.nom}</h3>
+              <p class="price">${Number(produit.prix).toFixed(3)} TND</p>
+              <p>${produit.description}</p>
+            </div>
+          `;
+                    container.insertAdjacentHTML('beforeend', produitHTML);
+                });
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement des produits:', error);
+            });
+    }
+
+    // Charger les produits au chargement de la page
+    window.onload = function () {
+        loadProduits();
+    };
+</script>
+
+</body>
+
+
+<div class="footer-bottom">
+      <p>© 2025 Kidzy. All rights reserved. | Designed in Tunisia</p>
+</div>
+
+
+</html>

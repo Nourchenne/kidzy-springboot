@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier Produit</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<nav>
+    <div class="nav-container">
+        <a href="index.html">
+            <img src="img/logo2.png" alt="Logo" class="logo">
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="/produits.html">Products</a>
+            <a href="/about.html">About</a>
+            <a href="/contact.html">Contact</a>
+        </div>
+        <a href="/login.html">
+            <img src="img/user-icon.png" alt="User Icon" style="width: 50px; height: 50px;">
+        </a>
+    </div>
+</nav>
+
+
+<body>
+<div class="form-container">
+    <h2>Modifier le Produit</h2>
+    <form id="form-modifier-produit">
+        <input type="text" id="nom" name="nom" required>
+        <input type="number" id="prix" name="prix" step="0.001" required>
+        <textarea id="description" name="description" required></textarea>
+        <input type="text" id="photo" name="photo" required>
+        <button type="button" id="modifier-btn" class="btn-submit">Modifier</button>
+    </form>
+
+    <div id="message" style="text-align: center; margin-top: 10px;"></div>
+</div>
+
+<script>
+    // Récupération de l'ID du produit à partir de l'URL (ex: edit_produit.html?id=3)
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (!id) {
+        document.getElementById("message").textContent = "❌ Erreur : aucun ID fourni dans l'URL.";
+    } else {
+        // Charger les données existantes du produit
+        fetch(`/api/produits/${id}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Produit introuvable");
+                return response.json();
+            })
+            .then(produit => {
+                document.getElementById("nom").value = produit.nom;
+                document.getElementById("prix").value = produit.prix;
+                document.getElementById("description").value = produit.description;
+                document.getElementById("photo").value = produit.photo;
+            })
+            .catch(error => {
+                document.getElementById("message").textContent = "❌ " + error.message;
+            });
+
+        // Gestion du clic sur "Modifier"
+        document.getElementById('modifier-btn').addEventListener('click', () => {
+            const nom = document.getElementById('nom').value;
+            const prix = parseFloat(document.getElementById('prix').value);
+            const description = document.getElementById('description').value;
+            const photo = document.getElementById('photo').value;
+
+            fetch(`/api/produits/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nom,
+                    prix,
+                    description,
+                    photo
+                })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Erreur lors de la mise à jour.");
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('message').textContent = "✅ Produit modifié avec succès !";
+                })
+                .catch(error => {
+                    document.getElementById('message').textContent = "❌ " + error.message;
+                });
+        });
+    }
+</script>
+</body>
+
+
+</html>
